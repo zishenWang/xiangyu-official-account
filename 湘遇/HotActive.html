@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<title>热门活动</title>
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="js/vue.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/team.css">  
+<script>
+	window.onload=function(){
+		var vm=new Vue({
+			el:'#active',
+			data:{
+				actives:[{name:'岳麓山爬山比赛',initiator:'李思思',starttime:'今天  12:00',image1:'images/1-1.png',image2:'images/1-2.png',image3:'images/1-3.png',endtime:'2018-03-20 18:30',isLast:false,url: 'ActiveInfo.html'},
+					{name:'岳麓山爬山比赛',initiator:'李思思',starttime:'今天  12:00',image1:'images/1-1.png',image2:'images/1-2.png',image3:'images/1-3.png',endtime:'2018-03-20 18:30',isLast:false,url: 'ActiveInfo.html'},
+					{name:'岳麓山爬山比赛',initiator:'李思思',starttime:'今天  12:00',image1:'images/1-1.png',image2:'images/1-2.png',image3:'images/1-3.png',endtime:'2018-03-20 18:30',isLast:true,url: 'ActiveInfo.html'}],
+				blank: 'images/blank.png',
+			}
+		})
+	}
+</script>
+</head>
+<body>
+	<div id="active">
+		<div v-for="active in actives">
+			<a :href="active.url">
+				<div class="content info-content">
+					<div class="active-head">
+						<div class='title bold primary'>{{active.name}}</div>
+					</div>
+					<div class="space-between sm-padding">
+						<div class="mycontent secondary flex-row">
+							<div>发起人:</div>
+							<div class="blue">{{active.initiator}}</div>
+						</div>
+						<div class="mycontent secondary">
+							<div>{{active.starttime}}</div>
+						</div>
+					</div>
+					<div class="space-between">
+						<img class="imgs" :src="active.image1">
+						<img class="imgs" :src="active.image2">
+						<img class="imgs" :src="active.image3">
+					</div>
+
+					<div class="mycontent primary footer">
+						<div>报名截止时间:  {{active.endtime}}</div>
+					</div>
+				</div>
+				<img :src="blank" class="blank" v-if="!active.isLast">
+			</a>	
+		</div>
+	</div>
+</body>
+</html>

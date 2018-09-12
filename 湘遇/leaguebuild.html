@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/team.css">
+   	<script src="js/vue.js"></script>
+   	<script src="js/jquery.js"></script>
+</head>
+<body>
+	<div id="theysay">
+		<!-- 团建详情 -->
+		<div class="content info-content">
+			<div class="flex-row" >
+				<img :src="tbData.header" class="avatar-s">
+				<div class="primary title column-center">{{tbData.presentorName}}</div>
+			</div>
+			<div class="title primary they-title">{{tbData.title}}</div>
+			<div class="secondary mycontent they-content">{{tbData.content}}</div>
+			<div class="space-between">
+				<img :class="imgs" v-for="img in tbData.photos" :src="img.photoId">
+			</div>
+			<div class="footer sm-font secondary space-between">
+				<div>{{tbData.time}}</div>
+				<div class="flex-row">
+					<img :src="comment">
+					<div>{{tbData.commentAmount}}</div>
+				</div>
+			</div>
+		</div>
+		<img :src="blank" class="blank">
+		<!-- 评论区 -->
+		<div class="comments content">
+			<!-- 点赞列表 -->
+			<div class="like flex-row">
+				<img :src="nlike" v-if="!isLike" v-on:click="clickLike">
+				<img :src="like" v-if="isLike" v-on:click="clickLike">
+				<div class="sm-font blue flex-row" v-for="item in tbData.likes">{{item.presentorName}}
+					<div v-if="!item.isLast">、</div>
+				</div>
+			</div>
+			<!-- 评论 -->
+			<div class="comment-head mycontent secondary flex-center" v-if="!hasComment">暂无评论！</div>
+
+			<div v-for="item in comData.list" v-if='hasComment'>
+				<div class="flex-row comment-head">
+					<img class="avatar" :src="item.header">
+					<div class="title primary column-center">&nbsp;{{item.presentorName}}&nbsp;&nbsp;</div>
+					<div class="sm-font secondary column-center">{{item.gmtCreate}}</div>
+				</div>
+				<div class="mycontent primary">{{item.content}}</div>
+			</div>
+			<div class="flex-center">
+				<a @click="reGetComData" v-if='!isloading&&!isend&&hasComment' class="mycontent secondary loading">点击加载更多</a>
+				<div v-if='isend' class="mycontent secondary loading">已全部加载完毕</div>
+				<img class='load-img loading' v-if='isloading' src="images/loading.gif">
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+	var vm = new Vue({
+		el: '#theysay',
+		data: {
+			comment: 'images/comment.png',
+		  	blank: 'images/blank.png',
+		  	nlike: 'images/nlike.png',
+		  	like: 'images/like.png',
+		  	host: 'http://xiangyu.douziit.com',
+		  	tbUrl:'/gzh/club/tb/detail.do',
+		  	comUrl:'/gzh/club/tb/pgcomment.do',
+		  	tbData:{
+		        "list": [{
+		                "gmtCreate": "",//发布日期
+		                "presentor": 4,
+		                "presentorName": '', //发布者昵称
+		                "header": "",//发布者头像
+		                "title": "",//标题
+		                "content": "",//内容
+		                "likeAmount": 1,//点赞数
+		                "commentAmount": 1,//评论数
+		                "photos": [{
+		                        "id": 27,
+		                        "photoId": "",//团建图片
+		                        "bzId": 16
+		                }],
+		                "likes": [{
+			                "uid": 9,
+			                "presentorName": "", //点赞者昵称
+			                "bzId": 26
+		        		}],
+		                "time": ""//发布时间
+		        }],
+		    },
+		    comData:{
+		        "list": [],
+		    },
+		    imgs: 'imgs',
+		    pageCurrent:1,
+		  	isLike: false,
+		  	hasComment: false,
+		  	isend:false,
+		  	isloading:false,
+		},
+		created: function(){
+			this.getTbData()
+			this.getComData()
+		},
+		methods: {
+	  		clickLike: function(){
+	  			if(!(this.isLike)){
+	  				//点赞
+	  				this.isLike = true;
+	  				this.tbData.likes.unshift({presentorName: '我自己', isLast: false});
+	  			}else{
+	  				//取消赞
+	  				this.isLike = false;
+	  				this.tbData.likes.shift();
+	  			}
+	  		},
+		  	getQueryVariable:function(variable){
+				var query = window.location.search.substring(1);
+				var vars = query.split("&");
+				for (var i=0;i<vars.length;i++) {
+				    var pair = vars[i].split("=");
+				    if(pair[0] == variable){return pair[1];}
+				}
+				return(false);
+			},
+		  	getTbData: function(){
+		  		var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.tbUrl,
+					type: "POST",
+					data:{ id: id},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							vm.tbData = res.data
+							vm.tbData.header = vm.host + vm.tbData.header
+							if(typeof(vm.tbData.photos) != "undefined"){
+								if(vm.tbData.photos.length > 3){
+									vm.tbData.photos = vm.tbData.photos.slice(0,3)
+								}
+								if(vm.tbData.photos.length == 1 ){
+									vm.imgs = 'one-imgs'
+								}
+								else if(vm.tbData.photos.length == 2){
+									vm.imas = 'two-imgs'
+								}
+								for(var i = 0; i < vm.tbData.photos.length; i++){
+									vm.tbData.photos[i].photoId = vm.host + vm.tbData.photos[i].photoId
+								}
+							}
+							if(typeof(vm.tbData.likes) != "undefined" && vm.tbData.likes.length > 0){
+								for(var i = 0; i < vm.tbData.likes.length; i++){
+									vm.tbData.likes[i]['isLast'] = false
+								}
+								vm.tbData.likes[vm.tbData.likes.length - 1]['isLast'] = true
+							}
+						}
+					}
+				})
+		  	},
+		  	getComData:function(){
+				var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.comUrl,
+					type: "POST",
+					data:{ id: id,pageCurrent:vm.pageCurrent, pageSize:5},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							var list = res.data.list
+							if(res.data.count > 0){
+								vm.hasComment = true
+								if(vm.pageCurrent >= res.data.totalPage){
+									vm.isend = true
+								}else{
+									vm.pageCurrent += 1
+								}
+								for(var i = 0; i < list.length; i++ ){
+									list[i].header = vm.host + list[i].header
+									vm.comData.list.push(list[i])
+								}
+							}
+							vm.isloading = false
+						}
+					}
+				})
+			},
+			reGetComData:function(){
+				this.isloading = true
+				this.getComData()
+			}
+	    },
+	})
+</script>
+</body>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/team.css">  
+   	<script src="js/vue.js"></script>
+   	<script src="js/jquery.js"></script>
+</head>
+<body>
+	<div id="team">
+		<div v-for="team in teams">
+			<a :href="team.url">
+				<div class="content">
+					<div class='team-head'>
+						<img :src="team.logoImage" class="avatar-s">
+						<div class="column-center primary title bold">{{team.name}}</div>
+					</div>
+					<div class="mycontent team-content">
+						{{team.introduction}}
+					</div>
+					<div class="team-foot space-between">
+						<div class="team-leader">
+							<img :src="leaderimage">
+							<div>团长：</div>
+							<div style="color: #fac23e">{{team.creatorName}}</div>
+						</div>
+						<div class="member-num">
+							<img :src="memberimage">
+							<div>成员数：{{team.memberNumber}}</div>
+						</div>
+					</div>
+				</div>
+			</a>
+			<img :src="blank" class="blank">
+		</div>
+		<div class="flex-center">
+			<a @click="loading" v-if='!isloading&&!isend' class="mycontent secondary loading">点击加载更多</a>
+			<div v-if='isend' class="mycontent secondary loading">已全部加载完毕</div>
+			<img class='load-img loading' v-if='isloading' src="images/loading.gif">
+		</div>
+	</div>
+
+<script type="text/javascript">
+	var vm = new Vue({
+	 	el: '#team',
+	  	data: {
+		    teams: [],
+		    leaderimage: 'images/leader.png',
+		    memberimage: 'images/member.png',
+		    blank: 'images/blank.png',
+		    laoding:'images/loading.gif',
+		    host: 'http://xiangyu.douziit.com',
+		    url:'/gzh/club/base/pglist.do',
+		    pageCurrent: 1,
+		    totalPage:0,
+		    pageSize:5,
+		    count: null,
+		    isloading: false,
+		    isend:false,
+		},
+		created: function() {
+				this.getData()
+		},
+		methods: {
+			getData: function() {
+				var vm = this
+				$.ajax({
+					url: vm.host + vm.url,
+					type: "POST",
+					data:{ pageCurrent: vm.pageCurrent, pageSize: vm.pageSize,},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							var list = res.data.list;
+							vm.totalPage = res.data.totalPage
+							for(var i = 0; i < list.length; i++){
+								list[i].logoImage = vm.host + list[i].logoImage;
+								list[i]['url'] = 'teaminfo.html?id=' + list[i].id;
+								vm.teams.push(list[i]);
+							}
+							if(vm.pageCurrent == vm.totalPage){
+								vm.isend = true
+							}
+						}
+					}
+				})
+			},
+			loading: function (){
+				var vm = this
+				vm.isloading = true
+				if(vm.pageCurrent < vm.totalPage)
+				vm.pageCurrent += 1
+				$.ajax({
+					url: vm.host + vm.url,
+					type: "POST",
+					data:{ pageCurrent: vm.pageCurrent, pageSize: vm.pageSize,},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							var list = res.data.list;
+							for(var i = 0; i < list.length; i++){
+								list[i].logoImage = vm.host + list[i].logoImage;
+								list[i]['url'] = 'teaminfo.html?id=' + list[i].id;
+								vm.teams.push(list[i]);
+							}
+						}
+						vm.isloading = false
+						if(vm.pageCurrent == vm.totalPage){
+							vm.isend = true
+						}
+					}
+				})
+			}
+		},
+	})
+</script>
+</body>
+</html>

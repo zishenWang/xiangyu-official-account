@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/swiper.min.css">  
+    <link rel="stylesheet" type="text/css" href="css/team.css">
+   	<script src="js/vue.js"></script>
+   	<script src="js/jquery.js"></script>
+   	<script src="js/swiper.min.js"></script>
+</head>
+<body>
+	<div id="teaminfo">
+		<!-- 社团名 -->
+		<div class="teaminfo-head content">
+			<img :src="teamData.logoImage">
+			<div class="info">
+				<div class="primary title bold">{{teamData.name}}</div>
+				<div class="secondary mycontent">成员：{{teamData.memberNumber}}&emsp;昨日来访：{{teamData.yesterdayTraffic}}</div>
+			</div>
+		</div>
+
+		<img :src="blank" class="blank">
+		<!-- 所属学校及团长 -->
+		<div class="space-between mycontent content" style="margin-bottom: 15px;margin-top: 15px">
+			<div class="flex-row">
+				<div class="secondary">所属学校：</div>
+				<div class="primary">{{teamData.college}}</div>
+			</div>
+			<div class="flex-row">
+				<div class="secondary">团长：</div>
+				<div class="primary">{{teamData.creatorName}}</div>
+			</div>
+		</div>
+		<hr style="border-top: 1px solid #f8f8fd;margin: 0px">
+		<!-- 公告 -->
+		<div class="mycontent content" style="margin-bottom: 15px;margin-top: 15px">
+			<div class="flex-row">
+				<div v-if='hasNotice' class="notice">公告：{{teamData.notice.title}}</div>
+				<div v-if='!hasNotice' class="notice">公告：{{notice}}</div>
+			</div>
+		</div>
+		<img :src="blank" class="blank">
+		<!-- 团队介绍 -->
+		<div class="content info-content">
+			<img :src="teamData.coverImage" style="width: 100%;padding-bottom: 20px;">
+			<div class="info-title flex-row">
+				<hr style="border-top: 20px solid #00bbff;margin: 0px;width:3px;">
+				<div class="title primary">&nbsp;&nbsp;&nbsp;团队介绍</div>
+			</div>
+			<div class="mycontent secondary" style="padding-top:10px;">
+				<p>{{teamData.introduction}}</p>
+			</div>
+		</div>
+		<img :src="blank" class="blank">
+		<!-- 他们说 -->
+		<div class="content info-content" >
+			<div class="info-title flex-row">
+				<hr style="border-top: 20px solid #00bbff;margin: 0px;width:3px;">
+				<div class="title primary">&nbsp;&nbsp;&nbsp;他们说</div>
+			</div>
+			<div class="secondary mycontent flex-center" v-if='!hasSpData'>暂无数据！</div>
+			<div v-for="item in speakData.list" v-if='hasSpData'>
+				<a :href="item.url">
+					<div class="flex-row" style="padding-top: 20px;">
+						<img :src="item.header" class="avatar-s">
+						<div class="primary title column-center">{{item.presentorName}}</div>
+					</div>
+					<div class="mycontent secondary they-content">{{item.content}}</div>
+					<div class="space-between">
+						<img :class="imgs" v-for="img in item.photos" :src="img.photoId">
+					</div>
+					<div class="footer sm-font secondary space-between">
+						<div>{{item.time}}</div>
+						<div class="flex-row">
+							<img :src="comment">
+							<div>{{item.commentAmount}}</div>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<div class="flex-center">
+			<a @click="reGetSpeakData" v-if='!isloading&&!isend&&hasSpData' class="mycontent secondary loading">点击加载更多</a>
+			<div v-if='isend' class="mycontent secondary loading">已全部加载完毕</div>
+			<img class='load-img loading' v-if='isloading' src="images/loading.gif">
+		</div>
+		<img :src="blank" class="blank">
+		<!-- 团建 -->
+		<div class="content info-content">
+			<div class="info-title flex-row">
+				<hr style="border-top: 20px solid #00bbff;margin: 0px;width:3px;">
+				<div class="title primary">&nbsp;&nbsp;&nbsp;团建</div>
+			</div>
+			<div class="secondary mycontent flex-center" v-if='!hasTbData'>暂无数据！</div>
+			<div class="swiper-container">
+				<div class="swiper-wrapper">
+					<div class="leaguebuild swiper-slide" v-for="item in tbData.list">	
+						<a :href='item.url'>
+							<div class="flex-row lb-date">
+								<div class="title primary">{{item.day}}</div>
+								<div class="sm-font primary">&nbsp;&nbsp;{{item.month}}月</div>
+							</div> 
+							<img :src="noimg" v-if="!item.hasImg">
+							<img :src="item.photos[0].photoId" v-if="item.hasImg">
+							<div class="title primary">{{item.title}}</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+	var vm = new Vue({
+		el: '#teaminfo',
+		data: {
+			noimg: 'images/noimg.png',
+		    blank: 'images/blank.png',
+		    comment: 'images/comment.png',
+		    host: 'http://xiangyu.douziit.com',
+		    teamUrl:'/gzh/club/base/detail.do',
+		    speakUrl:'/gzh/club/speak/pglist.do',
+		    tbUrl:'/gzh/club/tb/pglist.do',
+		    teamData: {
+		        "id": 1,        
+				"gmtCreate": "",//团队创建时间
+		        "name": "",//团队名称
+		        "logoImage": "",//团队logo
+		        "creator": 1,
+				"creatorName": "",//团长昵称
+		        "memberNumber": 2,//团队数量
+		        "introduction": "",//团队简介
+		        "notice": {
+		            "id": 2,
+		            "title": ""//公告
+		        },
+		        "time": "",//发布时间
+		        "college": "",//团队学校
+		    },
+		    speakData:{list:[]},
+		    tbData: {
+		        "list": [{
+		            "id": 16,
+		            "clubId": 14,
+		            "gmtCreate": "",//发布日期
+		            "presentor": 4,
+		           	"presentorName": "", //发布者昵称
+	                "header": "",//发布者头像
+	                "title": "",
+	                "content": "",
+	                "photos": [{
+		                "id": 27,
+		                "photoId": "",//团建图片
+		                "bzId": 16
+		            }],
+		        }],
+		    },
+		    imgs:'imgs',
+		    hasNotice: true,
+		    hasSpData : false,
+		    hasTbData: false,
+		    notice:'无',
+		    spPgCurrent:1,
+		    spPgSize:5,
+		    speakType:3,
+		    tbType: 1,
+		    tbPgCurrent: 1,
+		    tbPgSize: 99,
+		    isend:false,
+		    isloading:false,
+		},
+		created: function() {
+			this.getTeamData()
+			this.getSpeakData()
+			this.getTbData()
+		},
+		mounted:function (){
+		
+		},
+		methods: {
+			getQueryVariable:function(variable){
+				var query = window.location.search.substring(1);
+				var vars = query.split("&");
+				for (var i=0;i<vars.length;i++) {
+				    var pair = vars[i].split("=");
+				    if(pair[0] == variable){return pair[1];}
+				}
+				return(false);
+			},
+			getMonth: function(variable){
+				return variable.substring(5,7)
+			},
+			getDay:function(variable){
+				return variable.substring(8,10)
+			},
+			
+			getTeamData: function() {
+				var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.teamUrl,
+					type: "POST",
+					data:{ id: id},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							vm.teamData = res.data
+							vm.teamData.logoImage = vm.host + vm.teamData.logoImage
+							if(typeof(res.data.coverImage) != "undefined"){
+							vm.teamData.coverImage = vm.host + vm.teamData.coverImage
+							}
+							if(typeof(vm.teamData.notice) == "undefined"){
+								vm.hasNotice = false
+							}
+						}
+					}
+				})
+			},
+			
+			getSpeakData: function(){
+				var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.speakUrl,
+					type: "POST",
+					data:{ type: vm.speakType, id: id, pageCurrent: vm.spPgCurrent, pageSize: vm.spPgSize},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							if(res.data.count > 0){
+								vm.hasSpData = true
+								if (vm.spPgCurrent >= res.data.totalPage) {
+									vm.isend = true
+								}else{
+									vm.spPgCurrent += 1
+								}
+								var list = res.data.list
+								for(var i = 0; i < list.length; i++){
+									list[i].header = vm.host + list[i].header
+									list[i]['url'] = 'theysay.html?id=' + list[i].id
+									if(typeof(list[i].photos) != "undefined"){
+										list[i]['hasImg'] = true
+										if(list[i].photos.length > 3){
+											list[i].photos = list[i].photos.slice(0,3)
+										}
+										if(list[i].photos.length == 1 ){
+											vm.imgs = 'one-imgs'
+										}
+										else if(list[i].photos.length == 2){
+											vm.imas = 'two-imgs'
+										}
+										for(var j = 0; j < list[i].photos.length; j++){
+											list[i].photos[j].photoId = vm.host + list[i].photos[j].photoId
+										}
+									}else{
+										list[i]['hasImg'] = false
+									}
+									vm.speakData.list.push(list[i])
+								}
+							}
+							vm.isloading = false
+						}
+					}
+				})
+			},
+
+			getTbData: function(){
+				var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.tbUrl,
+					type: "POST",
+					data:{ type: vm.tbType, id: id, pageCurrent: vm.tbPgCurrent, pageSize: vm.tbPgSize},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							vm.tbData = res.data
+							if(res.data.count > 0){
+								vm.hasTbData = true
+								for(var i = 0; i < vm.tbData.list.length; i++){							
+									vm.tbData.list[i]['month'] = vm.getMonth(vm.tbData.list[i].gmtCreate)
+									vm.tbData.list[i]['day'] = vm.getDay(vm.tbData.list[i].gmtCreate)
+									vm.tbData.list[i]['url'] = 'leaguebuild.html?id=' + vm.tbData.list[i].id
+									if(typeof(vm.tbData.list[i].photos) != "undefined"){
+										vm.tbData.list[i]['hasImg'] = true
+										vm.tbData.list[i].photos[0].photoId = vm.host + vm.tbData.list[i].photos[0].photoId
+									}else{
+										vm.tbData.list[i]['hasImg'] = false
+									}			
+								}
+								var swiper = new Swiper('.swiper-container', {
+							    	slidesPerView: 'auto',
+							    	spaceBetween: 0,
+							    	observer:true,
+									observeParents:true,
+							    });	
+							}
+						}
+					}
+				})
+			},
+			reGetSpeakData:function(){
+				this.isloading = true
+				this.getSpeakData()
+			}
+		},
+	});
+</script>
+
+</body>

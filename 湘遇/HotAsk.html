@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/swiper.min.css">  
+    <link rel="stylesheet" type="text/css" href="css/team.css">
+	<script src="js/vue.js"></script>
+	<script src="js/jquery.js"></script>
+
+</head>
+<body>
+<div id="ask">
+	<div v-for="ask in asks">
+		<a :href="ask.url">
+			<div class="content info-content">
+				<div class="space-between">
+					<div class="flex-row">
+						<img :src="ask.header" class="avatar-s">
+						<div class="primary title column-center">{{ask.nn}}</div>
+					</div>
+					<div class="mycontent secondary">{{ask.time}}</div>
+				</div>
+				<div class="primary title they-content">
+					{{ask.title}}
+				</div>
+				<div class="space-between">
+					<img :class="imgs" v-for="img in ask.photos" :src="img.photoId">
+				</div>
+
+				<div class="footer sm-font secondary space-between">
+					<div>
+						<div v-for='label in ask.labels'>#{{label.name}}#</div>
+					</div>
+					<div class="flex-r-row footer">
+						<div class="mycontent secondary">
+							<img :src="nlike">
+							{{ask.likeAmount}}&emsp;&nbsp;
+						</div>
+						<div>&emsp;
+							<img :src="comment">{{ask.commentAmount}}
+						</div>
+					</div>
+				</div>
+			</div>
+		</a>
+		<img :src="blank" class="blank" v-if="!ask.isLast">
+	</div>
+	<div class="flex-center">
+		<a @click="loading" v-if='!isloading&&!isend' class="mycontent secondary loading">点击加载更多</a>
+		<div v-if='isend' class="mycontent secondary loading">已全部加载完毕</div>
+		<img class='load-img loading' v-if='isloading' src="images/loading.gif">
+	</div>
+</div>
+
+	<script type="text/javascript">
+		var vm=new Vue({
+			el:'#ask',
+			data:{
+				asks:[],
+				blank: 'images/blank.png',
+				comment:'images/comment.png',
+                nlike:'images/nlike.png',
+				laoding:'images/loading.gif',
+				host: 'http://xiangyu.douziit.com',
+				url:'/gzh/ask/base/pglist.do',
+				pageCurrent: 1,
+				totalPage:0,
+				pageSize:5,
+				count: null,
+				imgs:'imgs',
+				isloading: false,
+				isend:false,
+				hasphoto:false,
+			},
+			created: function() {
+				this.getData()
+			},
+            methods: {
+                getData: function() {
+                    var vm = this
+                    $.ajax({
+                        url: vm.host + vm.url,
+                        type: "POST",
+                        data:{ pageCurrent: vm.pageCurrent, pageSize: vm.pageSize,},
+                        dataType: "json",
+                        success:function(res){
+                            if(res.code == 0){
+                                var list = res.data.list;
+                                vm.totalPage = res.data.totalPage
+                                for(var i = 0; i < list.length; i++){
+									list[i].header = vm.host + list[i].header;
+                                    if(list[i].header == "http://xiangyu.douziit.comundefined"){
+                                        list[i].header = 'images/leader.png'
+                                    }
+                                    list[i]['url'] = 'Askinfo.html?id=' + list[i].id;
+                                    if(typeof(list[i].photos) != "undefined"){
+                                        list[i]['hasImg'] = true
+                                        if(list[i].photos.length > 3){
+                                            list[i].photos = list[i].photos.slice(0,3)
+                                        }
+                                        if(list[i].photos.length == 1 ){
+                                            vm.imgs = 'one-imgs'
+                                        }
+                                        else if(list[i].photos.length == 2){
+                                            vm.imas = 'two-imgs'
+                                        }
+                                        for(var j = 0; j < list[i].photos.length; j++){
+                                            list[i].photos[j].photoId = vm.host + list[i].photos[j].photoId
+                                        }
+                                    }else{
+                                        list[i]['hasImg'] = false
+                                    }
+                                    vm.asks.push(list[i]);
+                                }
+                                if(vm.pageCurrent == vm.totalPage){
+                                    vm.isend = true
+                                }
+                            }
+                        }
+                    })
+                },
+                loading: function (){
+                    var vm = this
+                    vm.isloading = true
+                    if(vm.pageCurrent < vm.totalPage)
+                        vm.pageCurrent += 1
+                    $.ajax({
+                        url: vm.host + vm.url,
+                        type: "POST",
+                        data:{ pageCurrent: vm.pageCurrent, pageSize: vm.pageSize,},
+                        dataType: "json",
+                        success:function(res){
+                            if(res.code == 0){
+                                var list = res.data.list;
+                                for(var i = 0; i < list.length; i++){
+                                    list[i].header = vm.host + list[i].header;
+                                    if(list[i].header == "http://xiangyu.douziit.comundefined"){
+                                        list[i].header = 'images/leader.png'
+                                    }
+                                    list[i]['url'] = 'Askinfo.html?id=' + list[i].id;
+                                    if(typeof(list[i].photos) != "undefined"){
+                                        list[i]['hasImg'] = true
+                                        if(list[i].photos.length > 3){
+                                            list[i].photos = list[i].photos.slice(0,3)
+                                        }
+                                        if(list[i].photos.length == 1 ){
+                                            vm.imgs = 'one-imgs'
+                                        }
+                                        else if(list[i].photos.length == 2){
+                                            vm.imas = 'two-imgs'
+                                        }
+                                        for(var j = 0; j < list[i].photos.length; j++){
+                                            list[i].photos[j].photoId = vm.host + list[i].photos[j].photoId
+                                        }
+                                    }else{
+                                        list[i]['hasImg'] = false
+                                    }
+                                    vm.asks.push(list[i]);
+                                }
+                            }
+                            vm.isloading = false
+                            if(vm.pageCurrent == vm.totalPage){
+                                vm.isend = true
+                            }
+                        }
+                    })
+                }
+            },
+        })
+	</script>
+</body>
+</html>

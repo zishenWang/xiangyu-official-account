@@ -1,0 +1,236 @@
+body{
+	font-size: 0px;
+}
+.content{
+	padding-left: 15px;
+	padding-right: 15px;
+}
+.team-head{
+	display: flex;
+	padding-top: 20px;
+}
+.avatar-s{
+	height: 32px;
+	width: 32px;
+	margin-right: 10px;
+	border-radius: 50%;
+}
+.column-center{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.team-content{
+	margin-top: 5px;
+	color: #939399;
+	display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.team-foot{
+	margin-top: 15px;
+	color: #ababb3;
+	font-size: 12px;
+	padding-bottom: 20px;
+}
+.team-foot img{
+	height: 15px;
+	margin-right: 5px;
+}
+.team-leader{
+	display: flex;
+}
+.member-num{
+	display: flex;
+}
+.blank{
+	height: 8px;
+	width: 100%;
+}
+.teaminfo-head{
+	display: flex;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.teaminfo-head img{
+	height: 64px;
+	width: 64px;
+	margin-right: 10px;
+	border-radius: 50%;
+}
+.info{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+.info div{
+	margin: 2px;
+}
+.secondary{
+	color: #ababb3;
+}
+.primary{
+	color: black;
+}
+.title{
+	font-size: 15px;
+}
+.bold{
+	font-weight: bold;
+}
+.mycontent{
+	font-size: 13px;
+}
+.space-between{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.flex-row{
+	display: flex;
+}
+.info-content{
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+.info-title{
+	height: 20px;
+}
+p{
+	text-indent: 2em;
+	margin: 0px;
+}
+.imgs{
+	width: 31%;
+}
+.one-imgs{
+	width: 100%;
+}
+.two-imgs{
+	width: 47%;
+}
+.they-title{
+	padding-top: 10px;
+}
+.they-content{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.footer{
+	padding-top: 10px;
+}
+.sm-font{
+	font-size: 12px;
+}
+.footer img{
+	height: 15px;
+	margin-right: 5px;
+}
+.leaguebuild{
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-right: 20px;
+	padding-top: 5px;
+	padding-left: 20px;
+	padding-bottom: 10px;
+	padding-right: 20px; 
+	border: 1px solid #e5e5e5;
+}
+.leaguebuild img{
+	width: 210px;
+	height: 150px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+.lb-date{
+	align-items: flex-end;
+}
+.swiper-slide {
+	width: 253px;
+}
+.comments{
+	padding-bottom: 15px;
+	padding-top: 15px;
+}
+.like img{
+	height: 15px;
+	width: 15px;
+	margin-right: 5px;
+}
+.mybtn{
+	border: none;
+	border-radius: 100px;
+	width: 80px;
+	height: 25px;
+}
+.btn-blue{
+	background-color: #7bd8fa;
+}
+.blue{
+	color: #509ccc;
+}
+.avatar{
+	height: 32px;
+	width: 32px;
+	margin-right: 5px;
+}
+.comment-head{
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+.sm-padding{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.white{
+	color: white;
+}
+.flex-start{
+	align-items: flex-start;
+}
+.notice{
+	color: #fac23e;
+}
+.active-head{
+	margin-bottom: 3px;
+}
+.active-leader{
+	padding-top: 10px;
+}
+.active-content{
+	padding-top: 10px;
+	padding-bottom: 20px;
+}
+.active-image{
+	padding-top: 10px;
+}
+.active-image img{
+	width: 100%;
+}
+.flex-r-row{
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+.flex-center{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.loading{
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+.load-img{
+	width: 15px;
+	height: 15px;
+}
+a:link{text-decoration:none; }  /* 指正常的未被访问过的链接*/
+
+a:visited{text-decoration:none; }/*指已经访问过的链接*/
+
+a:hover{text-decoration:none;}/*指鼠标在链接*/}
+
+a:active{text-decoration:none;}/* 指正在点的链接*/ 

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/team.css">
+   	<script src="js/vue.js"></script>
+   	<script src="js/jquery.js"></script>
+</head>
+<body>
+	<div id="theysay">
+		<!-- 团言详情 -->
+		<div class="content info-content">
+			<div class="flex-row" >
+				<img :src="spData.header" class="avatar-s">
+				<div class="primary title column-center">{{spData.presentorName}}</div>
+			</div>
+			<div class="primary title they-content">{{spData.content}}</div>
+			<div class="space-between">
+				<img :class="imgs" v-for="img in spData.photos" :src="img.photoId">
+			</div>
+			<div class="footer sm-font secondary space-between">
+				<div>{{spData.time}}</div>
+				<div class="flex-row">
+					<img :src="comment">
+					<div>{{spData.commentAmount}}</div>
+				</div>
+			</div>
+		</div>
+		<img :src="blank" class="blank">
+		<!-- 评论区 -->
+		<div class="comments content">
+			<!-- 点赞列表 -->
+			<div class="like flex-row">
+				<img :src="nlike" v-if="!isLike" v-on:click="clickLike">
+				<img :src="like" v-if="isLike" v-on:click="clickLike">
+				<div class="sm-font blue flex-row" v-for="item in spData.likes">{{item.presentorName}}
+					<div v-if="!item.isLast">、</div>
+				</div>
+			</div>
+			<!-- 评论 -->
+			<div class="comment-head mycontent secondary flex-center" v-if="!hasComment">暂无评论！</div>
+
+			<div v-for="item in comData.list" v-if='hasComment'>
+				<div class="flex-row comment-head">
+					<img class="avatar" :src="item.header">
+					<div class="title primary column-center">&nbsp;{{item.presentorName}}&nbsp;&nbsp;</div>
+					<div class="sm-font secondary column-center">{{item.gmtCreate}}</div>
+				</div>
+				<div class="mycontent primary">{{item.content}}</div>
+			</div>
+			<div class="flex-center">
+				<a @click="reGetComData" v-if='!isloading&&!isend&&hasComment' class="mycontent secondary loading">点击加载更多</a>
+				<div v-if='isend' class="mycontent secondary loading">已全部加载完毕</div>
+				<img class='load-img loading' v-if='isloading' src="images/loading.gif">
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+	var vm = new Vue({
+		el: '#theysay',
+	 	data: {
+		  	comment: 'images/comment.png',
+		  	blank: 'images/blank.png',
+		  	nlike: 'images/nlike.png',
+		  	like: 'images/like.png',
+		  	host: 'http://xiangyu.douziit.com',
+		  	spUrl:'/gzh/club/speak/detail.do',
+		  	comUrl:'/gzh/club/speak/pgcomment.do',
+		  	spData: {
+                "id": 7,
+                "clubId": 3,
+                "presentor": 2,
+                "presentorName": "",//团言发布者昵称
+                "header": "", //团言发布者头像
+                "gmtCreate": "",//发布日期时间
+                "time": "",//发布时间
+                "content": "", //发布内容
+                "likeAmount": 2, //点赞数
+                "commentAmount": 3,  //评论数
+                "photos": [{
+                    "photoId": "",//照片地址
+                    "bzId": 7
+                }],
+		        "likes": [{
+		                "uid": 6,
+		                "presentorName": "",//点赞人昵称
+		                "bzId": 7
+		        }],
+            },
+            comData:{
+		        "list": [],
+		    },
+		    imgs:'imgs',
+		    pageCurrent:1,
+		  	isLike: false,
+		  	hasComment: false,
+		  	isend:false,
+		  	isloading:false,
+	  	},
+	  	created: function() {
+	  		this.getSpData()
+	  		this.getComData()
+	  	},
+	  	methods: {
+	  		clickLike: function(){
+	  			if(!(this.isLike)){
+	  				//点赞
+	  				this.isLike = true;
+	  				this.spData.likes.unshift({presentorName: '我自己', isLast: false});
+	  			}else{
+	  				//取消赞
+	  				this.isLike = false;
+	  				this.spData.likes.shift();
+	  			}
+	  		},
+		  	getQueryVariable:function(variable){
+				var query = window.location.search.substring(1);
+				var vars = query.split("&");
+				for (var i=0;i<vars.length;i++) {
+				    var pair = vars[i].split("=");
+				    if(pair[0] == variable){return pair[1];}
+				}
+				return(false);
+			},
+			getSpData:function(){
+				var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.spUrl,
+					type: "POST",
+					data:{ id: id},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							vm.spData = res.data
+							vm.spData.header = vm.host + vm.spData.header
+							if(typeof(vm.spData.photos) != "undefined"){
+								if(vm.spData.photos.length > 3){
+									vm.spData.photos = vm.spData.photos.slice(0,3)
+								}
+								if(vm.spData.photos.length == 1 ){
+									vm.imgs = 'one-imgs'
+								}
+								else if(vm.spData.photos.length == 2){
+									vm.imas = 'two-imgs'
+								}
+								for(var i = 0; i < vm.spData.photos.length; i++){
+									vm.spData.photos[i].photoId = vm.host + vm.spData.photos[i].photoId
+								}
+							}
+							if(typeof(vm.spData.likes) != "undefined" && vm.spData.likes.length > 0){
+								for(var i = 0; i < vm.spData.likes.length; i++){
+									vm.spData.likes[i]['isLast'] = false
+								}
+								vm.spData.likes[vm.spData.likes.length - 1]['isLast'] = true
+							}
+						}
+					}
+				})
+			},
+			getComData:function(){
+				var vm = this
+				var id = vm.getQueryVariable("id")
+				$.ajax({
+					url: vm.host + vm.comUrl,
+					type: "POST",
+					data:{ id: id,pageCurrent:vm.pageCurrent, pageSize:5},
+					dataType: "json",
+					success:function(res){
+						if(res.code == 0){
+							var list = res.data.list
+							if(res.data.count > 0){
+								vm.hasComment = true
+								if(vm.pageCurrent >= res.data.totalPage){
+									vm.isend = true
+								}else{
+									vm.pageCurrent += 1
+								}
+								for(var i = 0; i < list.length; i++ ){
+									list[i].header = vm.host + list[i].header
+									vm.comData.list.push(list[i])
+								}
+							}
+							vm.isloading = false
+						}
+					}
+				})
+			},
+			reGetComData:function(){
+				this.isloading = true
+				this.getComData()
+			}
+	  	},
+	})
+</script>
+<dy>

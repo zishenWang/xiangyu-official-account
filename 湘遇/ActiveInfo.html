@@ -1,0 +1,71 @@
+，<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<title>活动详情</title>
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="js/vue.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/team.css">  
+<script>
+	window.onload=function(){
+		var vm=new Vue({
+			el:'#active',
+			data:{
+				Info:{name:'首届数字中国建设分会投票活动',endtime:'2018-03-20 18:30',status:'进行中',leader:'李思思',content:'  本次投票活动主要是为了正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正',image:'images/1-info.png'},
+				message:[{headImg:'images/user/1.png',name:'刘雯雯',time:'今天  12:00',content:'这个任务体现的是团队队员之间的配合和信任,一个有领导,有配合有能动性的队伍才能称之为团队...'},
+					{headImg:'images/user/2.png',name:'刘雯雯',time:'今天  12:00',content:'这个任务体现的是团队队员之间的配合和信任...'},
+					{headImg:'images/user/3.png',name:'刘雯雯',time:'今天  12:00',content:'这个任务体现的是团队队员之间的配合和信任,一个有领导,有配合有能动性的队伍才能称之为团队...'},],
+				blank:'images/blank.png'
+			}
+		})
+	}
+</script>
+</head>
+<body>
+	<div id="active">
+		<div class="info-content content">
+			<div class="space-between flex-start active-head">
+				<div class="title primary">{{Info.name}}</div>
+				<button class="title mybtn btn-blue white column-center">{{Info.status}}</button> 
+			</div>
+			
+			<div class="notice mycontent">
+			截止时间:{{Info.endtime}}
+			</div>
+			
+			<div class="active-leader mycontent secondary">
+			发起人:{{Info.leader}}
+			</div>
+		</div>
+		<hr style="border-top: 1px solid #f5f5fa;margin: 0px">
+		<div class="content active-content">
+			<p class="mycontent secondary">
+			{{Info.content}}
+			</p>
+			<div class="active-image">
+				<img :src="Info.image">
+			</div>
+		</div>
+		<img :src="blank" class="blank">
+		<div class="content info-content">
+			<div class="title primary bold">留言({{message.length}}条)</div>
+			
+			<div v-for="msg in message">
+				<div class="flex-row comment-head">
+					<img class="avatar" :src="msg.headImg">
+					<div class="title primary column-center">&nbsp;{{msg.name}}&nbsp;&nbsp;</div>
+					<div class="sm-font secondary column-center">{{msg.time}}</div>
+				</div>
+				<div class="mycontent primary">
+					{{msg.content}}
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+Info:{name:'参加爬山比赛需要什么？',starttime:'2018-07-26 18:30',leader:'李思思',content:'  通过此次登山活动，为了全体同学正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正正',image:'images/1-info.png',likeNum: 20,commentNum:20,},
+message:[{headImg:'images/user/1.png',name:'刘雯雯',time:'今天  12:00',content:'这个任务体现的是团队队员之间的配合和信任,一个有领导,有配合有能动性的队伍才能称之为团队...'},
+{headImg:'images/user/2.png',name:'刘雯雯',time:'今天  12:00',content:'这个任务体现的是团队队员之间的配合和信任...'},
+{headImg:'images/user/3.png',name:'刘雯雯',time:'今天  12:00',content:'这个任务体现的是团队队员之间的配合和信任,一个有领导,有配合有能动性的队伍才能称之为团队...'},],
